@@ -29,8 +29,28 @@ def convert_m4a_to_mp3(directory):
                 except subprocess.CalledProcessError as e:
                     print(f'Error during conversion: {e}')
 
-src_folder = '/path/to/source/folder'  # Replace with your source folder path
-dest_folder = '/path/to/destination/folder'  # Replace with your destination folder path
 
-copy_folder(src_folder, dest_folder)
-convert_m4a_to_mp3(dest_folder)
+def delete_m4a_files(directory):
+    """
+    Delete all M4A files in the specified directory.
+    """
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file.endswith(".m4a"):
+                m4a_path = os.path.join(root, file)
+                try:
+                    os.remove(m4a_path)
+                    print(f"Deleted {m4a_path}")
+                except OSError as e:
+                    print(f'Error deleting file {m4a_path}: {e}')
+
+
+
+current_directory = os.getcwd()
+sub_folder_name = "data/der-besuch-der-alten-dame"
+source_folder_path = os.path.join(current_directory, sub_folder_name)
+destination_folder_path = current_directory + "/data/converted"
+
+# copy_folder(source_folder_path, destination_folder_path)
+# convert_m4a_to_mp3(destination_folder_path)
+delete_m4a_files(destination_folder_path)

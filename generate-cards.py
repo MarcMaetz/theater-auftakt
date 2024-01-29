@@ -18,7 +18,7 @@ def generate_meta_files(source_folder_path, destination_folder_path):
 
     # Create a new main directory for the directory.meta file and card folders
     main_dir_uuid = str(uuid.uuid4())
-    main_dir_path = os.path.join(destination_folder_path, main_dir_uuid)
+    main_dir_path = os.path.join(destination_folder_path, main_dir_uuid + '-_')
     os.makedirs(main_dir_path)
 
     # Create directory.meta file for the new main directory
@@ -38,7 +38,7 @@ def generate_meta_files(source_folder_path, destination_folder_path):
         card_uuid = str(uuid.uuid4())
 
         # Create a directory for the card in the new main directory
-        card_dir_path = os.path.join(main_dir_path, card_uuid + '-card')
+        card_dir_path = os.path.join(main_dir_path, card_uuid + '-[]')
         os.makedirs(card_dir_path)
 
         # Copy the audio files to the card directory
@@ -60,9 +60,10 @@ def generate_meta_files(source_folder_path, destination_folder_path):
     return "Meta files generated successfully in: " + main_dir_path
 
 current_directory = os.getcwd()
-sub_folder_name = "1-akt-1-szene"
+sub_folder_name = "data/der-besuch-der-alten-dame/1-akt-1-szene"
 source_folder_path = os.path.join(current_directory, sub_folder_name)
-result = generate_meta_files(source_folder_path, current_directory)
+destination_folder_path = current_directory + "/data"
+result = generate_meta_files(source_folder_path, destination_folder_path)
 print(result)
 
 # Note: The actual file path needs to be provided, and the script should be run in an environment where it can execute.
