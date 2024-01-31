@@ -16,6 +16,11 @@ def generate_meta_files(source_folder_path, destination_folder_path):
     if len(audio_files) % 2 != 0:
         return "The number of audio files is not even."
 
+    # Re-arrange the audio files list so the last file goes first
+    if audio_files:
+        audio_files = [audio_files[-1]] + audio_files[:-1]
+
+
     # Create a new main directory for the directory.meta file and card folders
     main_dir_uuid = str(uuid.uuid4())
     main_dir_path = os.path.join(destination_folder_path, main_dir_uuid + '-*')
@@ -68,7 +73,7 @@ def generate_meta_files(source_folder_path, destination_folder_path):
 
 # Example usage setup
 current_directory = os.getcwd()
-sub_folder_name = "data/der-besuch-der-alten-dame/1-akt-1-szene"
+sub_folder_name = "data/der-besuch-der-alten-dame/3-akt-4-szene"
 source_folder_path = os.path.join(current_directory, sub_folder_name)
 destination_folder_path = current_directory + "/data"
 result = generate_meta_files(source_folder_path, destination_folder_path)
