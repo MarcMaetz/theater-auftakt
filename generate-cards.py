@@ -18,13 +18,13 @@ def generate_meta_files(source_folder_path, destination_folder_path):
 
     # Create a new main directory for the directory.meta file and card folders
     main_dir_uuid = str(uuid.uuid4())
-    main_dir_path = os.path.join(destination_folder_path, main_dir_uuid + '-_')
+    main_dir_path = os.path.join(destination_folder_path, main_dir_uuid + '-*')
     os.makedirs(main_dir_path)
 
     # Create directory.meta file for the new main directory
     dir_meta = {
         "name": os.path.basename(source_folder_path),
-        "id": main_dir_uuid
+        "id": main_dir_uuid + '-*'
     }
     with open(os.path.join(main_dir_path, "directory.meta"), "w") as dir_meta_file:
         json.dump(dir_meta, dir_meta_file)
@@ -47,12 +47,15 @@ def generate_meta_files(source_folder_path, destination_folder_path):
             new_file_path = os.path.join(card_dir_path, file)
             shutil.copyfile(original_file_path, new_file_path)
 
+        # Generate new UUIDs for each audio file
+        audio1 = str(uuid.uuid4())
+        audio2 = str(uuid.uuid4())
         # Create card.meta file
         card_meta = {
             "name": f"C-{i//2 + 1:04d}",
             "id": card_uuid,
             "created": int(base_timestamp - (len(audio_files) - i) * 100000),  # Ensure it's an integer
-            "order": [str(uuid.uuid4()), str(uuid.uuid4())]  # Generate new UUIDs for each audio file
+            "order": [audio1, audio2]  
         }
         with open(os.path.join(card_dir_path, "card.meta"), "w") as card_meta_file:
             json.dump(card_meta, card_meta_file)
