@@ -3,6 +3,7 @@ import json
 import uuid
 import shutil
 from datetime import datetime
+import re
 
 def create_directory(path, meta_info):
     """Create a directory and its directory.meta file."""
@@ -35,7 +36,7 @@ def process_audio_files(subdir_path, destination_dir, base_timestamp):
     if len(audio_files) % 2 != 0:
         audio_files.append(None)  # Ensure even number of files for pairing
 
-    audio_files = audio_files[-1:] + audio_files[:-1]  # Move last file to first position
+    audio_files = sorted(audio_files, key=extract_number)
 
     for i in range(0, len(audio_files), 2):
         card_uuid = str(uuid.uuid4())
@@ -49,6 +50,10 @@ def process_audio_files(subdir_path, destination_dir, base_timestamp):
 
         copy_and_rename_audio_files(source_paths, card_dir_path, audio_uuids)
         generate_card_meta(card_dir_path, f"C-{i//2 + 1:04d}", card_uuid, base_timestamp, audio_uuids, i)
+
+def extract_number(filename):
+    match = re.search(r'\((\d+)\)', filename)
+    return int(match.group(1)) if match else 1
 
 def generate_meta_files(source_folder_path, destination_folder_path):
     if not os.path.exists(source_folder_path):
