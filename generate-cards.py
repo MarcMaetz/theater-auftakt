@@ -77,19 +77,21 @@ def generate_meta_files(source_folder_path, destination_folder_path):
 
     return main_dir_path
 
-def zip_folder(folder_path, zip_path):
+def zip_folder(folder_path):
     """
-    Zip the contents of a folder to a zip file.
+    Zip the contents of a folder to a zip file with the name of the folder.
     
     :param folder_path: Path to the folder to be zipped
-    :param zip_path: Path to the output zip file
     """
+    folder_name = os.path.basename(folder_path)
+    zip_name = f"{folder_name}.zip"
+    zip_path = os.path.join(os.path.dirname(folder_path), zip_name)
+    
     with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for root, _, files in os.walk(folder_path):
             for file in files:
                 file_path = os.path.join(root, file)
                 zipf.write(file_path, os.path.relpath(file_path, folder_path))
-
 
 
 # Adjusted example usage setup
@@ -98,5 +100,5 @@ sub_folder_name = "data/der-besuch-der-alten-dame"
 source_folder_path = os.path.join(current_directory, sub_folder_name)
 destination_folder_path = os.path.join(current_directory, "data")
 main_dir_path = generate_meta_files(source_folder_path, destination_folder_path)
-output_zip = os.path.join(destination_folder_path, 'der-besuch-der-alten-dame.zip')
-zip_folder(main_dir_path, output_zip)
+print('Output folder', main_dir_path)
+zip_folder(main_dir_path)
