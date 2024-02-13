@@ -4,6 +4,7 @@ import uuid
 import shutil
 from datetime import datetime
 import re
+import zipfile
 
 def create_directory(path, meta_info):
     """Create a directory and its directory.meta file."""
@@ -74,12 +75,28 @@ def generate_meta_files(source_folder_path, destination_folder_path):
             create_directory(sub_dir_path, {"name": subdir_name, "id": sub_dir_uuid + '-*'})
             process_audio_files(subdir_path, sub_dir_path, base_timestamp)
 
-    return f"Meta files generated successfully in: {main_dir_path}"
+    return main_dir_path
+
+def zip_folder(folder_path, zip_path):
+    """
+    Zip the contents of a folder to a zip file.
+    
+    :param folder_path: Path to the folder to be zipped
+    :param zip_path: Path to the output zip file
+    """
+    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for root, _, files in os.walk(folder_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                zipf.write(file_path, os.path.relpath(file_path, folder_path))
+
+
 
 # Adjusted example usage setup
 current_directory = os.getcwd()
 sub_folder_name = "data/der-besuch-der-alten-dame"
 source_folder_path = os.path.join(current_directory, sub_folder_name)
 destination_folder_path = os.path.join(current_directory, "data")
-result = generate_meta_files(source_folder_path, destination_folder_path)
-print(result)
+main_dir_path = generate_meta_files(source_folder_path, destination_folder_path)
+output_zip = os.path.join(destination_folder_path, 'der-besuch-der-alten-dame.zip')
+zip_folder(main_dir_path, output_zip)
