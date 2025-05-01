@@ -36,7 +36,7 @@ def delete_m4a_files(directory):
     """
     for root, dirs, files in os.walk(directory):
         for file in files:
-            if file.endswith(".m4a"):
+            if  ("m4a") in file:
                 m4a_path = os.path.join(root, file)
                 try:
                     os.remove(m4a_path)
@@ -46,11 +46,12 @@ def delete_m4a_files(directory):
 
 
 
+print("Starting")
 current_directory = os.getcwd()
-sub_folder_name = "data/der-besuch-der-alten-dame"
+sub_folder_name = "data/original"
 source_folder_path = os.path.join(current_directory, sub_folder_name)
 destination_folder_path = current_directory + "/data/converted"
 
-# copy_folder(source_folder_path, destination_folder_path)
-# convert_m4a_to_mp3(destination_folder_path)
+copy_folder(source_folder_path, destination_folder_path)
+convert_m4a_to_mp3(destination_folder_path)
 delete_m4a_files(destination_folder_path)
