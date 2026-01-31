@@ -5,6 +5,8 @@ import shutil
 from datetime import datetime
 import re
 import zipfile
+import sys
+
 
 def create_directory(path, meta_info):
     """Create a directory and its directory.meta file."""
@@ -53,8 +55,24 @@ def process_audio_files(subdir_path, destination_dir, base_timestamp):
         generate_card_meta(card_dir_path, f"C-{i//2 + 1:04d}", card_uuid, base_timestamp, audio_uuids, i)
 
 def extract_number(filename):
-    match = re.search(r'\((\d+)\)', filename)
-    return int(match.group(1)) if match else 1
+    """
+    Extracts two numbers from a filename:
+    - A leading number (e.g., '0003-Szene...')
+    - A number in parentheses (e.g., '(0002)')
+    
+    Returns a tuple (leading_number, inner_number), defaulting to 0 if not found.
+    This allows consistent and safe sorting.
+    """
+    # Try to find a number at the start of the filename
+    match1 = re.match(r'(\d+)', filename)
+    top_number = int(match1.group(1)) if match1 else 0
+
+    # Try to find a number in parentheses
+    match2 = re.search(r'\((\d+)\)', filename)
+    inner_number = int(match2.group(1)) if match2 else 0
+
+    return (top_number, inner_number)
+
 
 def generate_meta_files(source_folder_path, destination_folder_path):
     if not os.path.exists(source_folder_path):
@@ -67,6 +85,15 @@ def generate_meta_files(source_folder_path, destination_folder_path):
 
     base_timestamp = datetime.now().timestamp() * 1000
 
+    # ✅ First: process top-level audio files
+    top_audio_files = [f for f in os.listdir(source_folder_path) if f.endswith('.m4a')]
+    if top_audio_files:
+        sub_dir_uuid = str(uuid.uuid4())
+        sub_dir_path = os.path.join(main_dir_path, sub_dir_uuid + '-*')
+        create_directory(sub_dir_path, {"name": "_top_level", "id": sub_dir_uuid + '-*'})
+        process_audio_files(source_folder_path, sub_dir_path, base_timestamp)
+
+    # ✅ Then: process subdirectories
     for subdir_name in os.listdir(source_folder_path):
         subdir_path = os.path.join(source_folder_path, subdir_name)
         if os.path.isdir(subdir_path):
@@ -76,6 +103,7 @@ def generate_meta_files(source_folder_path, destination_folder_path):
             process_audio_files(subdir_path, sub_dir_path, base_timestamp)
 
     return main_dir_path
+
 
 def zip_folder(folder_path):
     """
@@ -94,11 +122,63 @@ def zip_folder(folder_path):
                 zipf.write(file_path, os.path.relpath(file_path, folder_path))
 
 
-# Adjusted example usage setup
-current_directory = os.getcwd()
-sub_folder_name = "data/der-besuch-der-alten-dame"
-source_folder_path = os.path.join(current_directory, sub_folder_name)
-destination_folder_path = os.path.join(current_directory, "data")
-main_dir_path = generate_meta_files(source_folder_path, destination_folder_path)
-print('Output folder', main_dir_path)
-zip_folder(main_dir_path)
+if __name__ == "__main__":
+    print("=" * 70)
+    print("GENERATE CARDS")
+    print("=" * 70)
+    print("WHAT THIS DOES:")
+    print("  Generates a card-based structure from audio files:")
+    print("  - Processes .m4a files from the input folder and its subdirectories")
+    print("  - Pairs audio files (2 files per card)")
+    print("  - Creates UUID-based folder structure with meta files")
+    print("  - Generates directory.meta and card.meta JSON files")
+    print("  - Outputs to 'data/' folder and creates a zip file")
+    print("")
+    print("PARAMETERS:")
+    print("  <input-folder>   (required) Path to folder containing .m4a files")
+    print("")
+    
+    if len(sys.argv) < 2:
+        print("ERROR: Missing required parameter <input-folder>")
+        print("")
+        print("USAGE:")
+        print("  python3 generate-cards.py <input-folder>")
+        print("")
+        print("EXAMPLE:")
+        print("  python3 generate-cards.py data/twice-in-a-lifetime")
+        print("")
+        print("PARAMETER EXPLANATION:")
+        print("  <input-folder>: Must be a path to an existing directory containing")
+        print("                  .m4a audio files (can be in subdirectories).")
+        print("                  Can be relative (e.g., 'data/my-folder') or absolute.")
+        print("                  Output will be saved to 'data/' folder in current directory.")
+        sys.exit(1)
+
+    sub_folder_name = sys.argv[1]
+    current_directory = os.getcwd()
+    source_folder_path = os.path.join(current_directory, sub_folder_name)
+    
+    # Validate input folder
+    if not os.path.isdir(source_folder_path):
+        print(f"ERROR: '{source_folder_path}' is not a valid directory.")
+        print("")
+        print("PARAMETER EXPLANATION:")
+        print("  <input-folder>: Must be a path to an existing directory containing")
+        print("                  .m4a audio files.")
+        print("                  Can be relative (e.g., 'data/my-folder') or absolute.")
+        print("                  If relative, it's resolved from current working directory.")
+        sys.exit(1)
+    
+    destination_folder_path = os.path.join(current_directory, "data")
+    
+    print(f"Input folder: {source_folder_path}")
+    print(f"Output folder: {destination_folder_path}")
+    print("=" * 70)
+    print("")
+    
+    main_dir_path = generate_meta_files(source_folder_path, destination_folder_path)
+    if main_dir_path:
+        print('')
+        print(f"Output folder: {main_dir_path}")
+        zip_folder(main_dir_path)
+        print(f"Zipped to: {main_dir_path}.zip")
