@@ -1,6 +1,7 @@
-data
+data/
+dist/
+build/
+cards/
 .venv
 .vscode
-cards
 *.m4a
-build

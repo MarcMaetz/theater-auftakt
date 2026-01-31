@@ -2,6 +2,16 @@
 
 This repository contains Python scripts for processing audio files for theater productions. All scripts are designed to be run from the command line with explicit parameters - nothing is hard-coded.
 
+## Quick Start for Non-Technical Users
+
+**For users who prefer a graphical interface**, use the GUI launcher:
+
+```bash
+python3 gui-launcher.py
+```
+
+This provides a simple point-and-click interface for all four tools. See [DISTRIBUTION.md](DISTRIBUTION.md) for instructions on creating standalone executables.
+
 ## Prerequisites
 
 - **Python 3** (tested with Python 3.x)
