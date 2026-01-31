@@ -1,5 +1,8 @@
 @echo off
 REM Build script for Windows executables
+REM Handle UNC paths (WSL network paths) by using pushd
+pushd "%~dp0"
+
 echo Building Theater-Auftakt for Windows...
 echo.
 
@@ -24,3 +27,4 @@ if exist "dist\Theater-Auftakt.exe" (
 )
 
 pause
+popd
