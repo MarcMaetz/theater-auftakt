@@ -136,27 +136,36 @@ if __name__ == "__main__":
     print("")
     print("PARAMETERS:")
     print("  <input-folder>   (required) Path to folder containing .m4a files")
+    print("  <output-folder>  (required) Destination folder for generated cards")
+    print("  [--no-zip]       (optional) Skip creating zip file")
     print("")
     
-    if len(sys.argv) < 2:
-        print("ERROR: Missing required parameter <input-folder>")
+    if len(sys.argv) < 3:
+        print("ERROR: Missing required parameters")
         print("")
         print("USAGE:")
-        print("  python3 generate-cards.py <input-folder>")
+        print("  python3 generate-cards.py <input-folder> <output-folder> [--no-zip]")
         print("")
         print("EXAMPLE:")
-        print("  python3 generate-cards.py data/twice-in-a-lifetime")
+        print("  python3 generate-cards.py data/twice-in-a-lifetime data/output")
+        print("  python3 generate-cards.py /path/to/input /path/to/output --no-zip")
         print("")
         print("PARAMETER EXPLANATION:")
         print("  <input-folder>: Must be a path to an existing directory containing")
         print("                  .m4a audio files (can be in subdirectories).")
         print("                  Can be relative (e.g., 'data/my-folder') or absolute.")
-        print("                  Output will be saved to 'data/' folder in current directory.")
+        print("")
+        print("  <output-folder>: Destination folder where card structure will be created.")
+        print("                   Will be created if it doesn't exist.")
+        print("                   Can be relative (e.g., 'data/output') or absolute.")
+        print("")
+        print("  [--no-zip]:     (optional) If provided, skip creating zip file.")
+        print("                  By default, a zip file is created in the output folder.")
         sys.exit(1)
 
-    sub_folder_name = sys.argv[1]
-    current_directory = os.getcwd()
-    source_folder_path = os.path.join(current_directory, sub_folder_name)
+    source_folder_path = sys.argv[1]
+    destination_folder_path = sys.argv[2]
+    create_zip = "--no-zip" not in sys.argv
     
     # Validate input folder
     if not os.path.isdir(source_folder_path):
@@ -166,13 +175,16 @@ if __name__ == "__main__":
         print("  <input-folder>: Must be a path to an existing directory containing")
         print("                  .m4a audio files.")
         print("                  Can be relative (e.g., 'data/my-folder') or absolute.")
-        print("                  If relative, it's resolved from current working directory.")
         sys.exit(1)
     
-    destination_folder_path = os.path.join(current_directory, "data")
+    # Create output directory if it doesn't exist
+    if not os.path.exists(destination_folder_path):
+        os.makedirs(destination_folder_path, exist_ok=True)
+        print(f"Created output directory: {destination_folder_path}")
     
     print(f"Input folder: {source_folder_path}")
     print(f"Output folder: {destination_folder_path}")
+    print(f"Create zip: {create_zip}")
     print("=" * 70)
     print("")
     
@@ -180,5 +192,6 @@ if __name__ == "__main__":
     if main_dir_path:
         print('')
         print(f"Output folder: {main_dir_path}")
-        zip_folder(main_dir_path)
-        print(f"Zipped to: {main_dir_path}.zip")
+        if create_zip:
+            zip_folder(main_dir_path)
+            print(f"Zipped to: {main_dir_path}.zip")

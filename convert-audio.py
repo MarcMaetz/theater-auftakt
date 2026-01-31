@@ -57,27 +57,31 @@ if __name__ == "__main__":
     print("")
     print("PARAMETERS:")
     print("  <source-folder>  (required) Path to folder containing .m4a files")
-    print("  <dest-folder>    (optional) Destination folder (default: data/converted)")
+    print("  <dest-folder>    (required) Destination folder for converted files")
     print("")
     
-    if len(sys.argv) < 2:
-        print("ERROR: Missing required parameter <source-folder>")
+    if len(sys.argv) < 3:
+        print("ERROR: Missing required parameters")
         print("")
         print("USAGE:")
-        print("  python3 convert-audio.py <source-folder> [dest-folder]")
+        print("  python3 convert-audio.py <source-folder> <dest-folder>")
         print("")
         print("EXAMPLE:")
-        print("  python3 convert-audio.py data/original")
         print("  python3 convert-audio.py data/original data/converted")
+        print("  python3 convert-audio.py /path/to/source /path/to/destination")
+        print("")
+        print("PARAMETER EXPLANATION:")
+        print("  <source-folder>: Must be a path to an existing directory containing")
+        print("                   .m4a audio files to convert.")
+        print("                   Can be relative (e.g., 'data/original') or absolute.")
+        print("")
+        print("  <dest-folder>:  Destination folder where files will be copied and")
+        print("                   converted. Will be created if it doesn't exist.")
+        print("                   Can be relative (e.g., 'data/converted') or absolute.")
         sys.exit(1)
     
     source_folder = sys.argv[1]
-    current_directory = os.getcwd()
-    
-    if len(sys.argv) > 2:
-        destination_folder = sys.argv[2]
-    else:
-        destination_folder = os.path.join(current_directory, "data/converted")
+    destination_folder = sys.argv[2]
     
     # Validate source folder
     if not os.path.isdir(source_folder):
@@ -87,10 +91,6 @@ if __name__ == "__main__":
         print("  <source-folder>: Must be a path to an existing directory containing")
         print("                   .m4a audio files to convert.")
         print("                   Can be relative (e.g., 'data/original') or absolute.")
-        print("")
-        print("  <dest-folder>:  (optional) Where to copy and convert files.")
-        print("                   If not provided, defaults to 'data/converted'")
-        print("                   in the current working directory.")
         sys.exit(1)
     
     print(f"Source folder: {source_folder}")

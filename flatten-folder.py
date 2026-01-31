@@ -18,9 +18,8 @@ def normalize_filename(filename):
     name, ext = os.path.splitext(filename)
     return f"{pad_all_numbers(name)}{ext}"
 
-def copy_and_rename_files(source_folder):
-    """Flatten directory structure into '<source>-flat', normalizing names and preserving total order."""
-    destination_folder = f"{source_folder}-flat"
+def copy_and_rename_files(source_folder, destination_folder):
+    """Flatten directory structure into destination folder, normalizing names and preserving total order."""
     if not os.path.exists(destination_folder):
         os.makedirs(destination_folder)
 
@@ -57,25 +56,31 @@ if __name__ == "__main__":
     print("")
     print("PARAMETERS:")
     print("  <source-folder>  (required) Path to folder to flatten")
+    print("  <dest-folder>    (required) Destination folder for flattened files")
     print("")
     
-    if len(sys.argv) != 2:
-        print("ERROR: Missing or incorrect number of parameters")
+    if len(sys.argv) < 3:
+        print("ERROR: Missing required parameters")
         print("")
         print("USAGE:")
-        print("  python3 flatten-folder.py <source-folder>")
+        print("  python3 flatten-folder.py <source-folder> <dest-folder>")
         print("")
         print("EXAMPLE:")
-        print("  python3 flatten-folder.py data/my-nested-folder")
+        print("  python3 flatten-folder.py data/my-nested-folder data/flattened")
+        print("  python3 flatten-folder.py /path/to/source /path/to/destination")
         print("")
         print("PARAMETER EXPLANATION:")
         print("  <source-folder>: Must be a path to an existing directory with")
         print("                   nested subdirectories and files to flatten.")
         print("                   Can be relative (e.g., 'data/my-folder') or absolute.")
-        print("                   Output will be created as '<source-folder>-flat'")
+        print("")
+        print("  <dest-folder>:  Destination folder where flattened files will be saved.")
+        print("                   Will be created if it doesn't exist.")
+        print("                   Can be relative (e.g., 'data/flattened') or absolute.")
         sys.exit(1)
 
     source_folder = sys.argv[1]
+    destination_folder = sys.argv[2]
 
     if not os.path.isdir(source_folder):
         print(f"ERROR: '{source_folder}' is not a valid directory.")
@@ -86,8 +91,8 @@ if __name__ == "__main__":
         sys.exit(1)
 
     print(f"Source folder: {source_folder}")
-    print(f"Output folder: {source_folder}-flat")
+    print(f"Output folder: {destination_folder}")
     print("=" * 70)
     print("")
 
-    copy_and_rename_files(source_folder)
+    copy_and_rename_files(source_folder, destination_folder)

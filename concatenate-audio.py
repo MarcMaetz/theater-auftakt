@@ -8,7 +8,7 @@ def extract_number(filename):
     match = re.search(r'\((\d+)\)', filename)
     return int(match.group(1)) if match else 1  # Default to 1 if no number is found
 
-def concatenate_audio(source_folder_path, output_filename="final_audio.m4a"):
+def concatenate_audio(source_folder_path, output_path):
     """Concatenates all audio files in the same order as they would be processed."""
     full_audio = AudioSegment.silent(duration=0)  # Start with silence
 
@@ -34,8 +34,7 @@ def concatenate_audio(source_folder_path, output_filename="final_audio.m4a"):
                     audio_segment = AudioSegment.from_file(source_path, format="m4a")
                     full_audio += audio_segment  # Append in order
 
-    # Export final concatenated audio to the script execution directory
-    output_path = os.path.join(os.getcwd(), output_filename)
+    # Export final concatenated audio
     full_audio.export(output_path, format="mp4")
     print(f"Final concatenated audio saved at: {output_path}")
 
@@ -51,22 +50,31 @@ if __name__ == "__main__":
     print("PARAMETERS:")
     print("  <source-folder>  (required) Path to folder containing subdirectories")
     print("                    with .m4a files to concatenate")
-    print("  <output-file>    (optional) Output filename (default: final_audio.m4a)")
+    print("  <output-file>    (required) Full path to output file (e.g., ./output.m4a)")
     print("")
     
-    if len(sys.argv) < 2:
-        print("ERROR: Missing required parameter <source-folder>")
+    if len(sys.argv) < 3:
+        print("ERROR: Missing required parameters")
         print("")
         print("USAGE:")
-        print("  python3 concatenate-audio.py <source-folder> [output-file]")
+        print("  python3 concatenate-audio.py <source-folder> <output-file>")
         print("")
         print("EXAMPLE:")
-        print("  python3 concatenate-audio.py data/twice-in-a-lifetime")
-        print("  python3 concatenate-audio.py data/twice-in-a-lifetime my_output.m4a")
+        print("  python3 concatenate-audio.py data/twice-in-a-lifetime ./final_audio.m4a")
+        print("  python3 concatenate-audio.py data/twice-in-a-lifetime /path/to/output.m4a")
+        print("")
+        print("PARAMETER EXPLANATION:")
+        print("  <source-folder>: Must be a path to an existing directory containing")
+        print("                   subdirectories with .m4a audio files.")
+        print("                   Can be relative (e.g., 'data/my-folder') or absolute.")
+        print("")
+        print("  <output-file>:   Full path where the concatenated audio will be saved.")
+        print("                   Can be relative (e.g., './output.m4a') or absolute.")
+        print("                   Directory will be created if it doesn't exist.")
         sys.exit(1)
     
     source_folder = sys.argv[1]
-    output_filename = sys.argv[2] if len(sys.argv) > 2 else "final_audio.m4a"
+    output_file = sys.argv[2]
     
     # Validate source folder
     if not os.path.isdir(source_folder):
@@ -78,9 +86,15 @@ if __name__ == "__main__":
         print("                   Can be relative (e.g., 'data/my-folder') or absolute.")
         sys.exit(1)
     
+    # Create output directory if it doesn't exist
+    output_dir = os.path.dirname(output_file)
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir, exist_ok=True)
+        print(f"Created output directory: {output_dir}")
+    
     print(f"Source folder: {source_folder}")
-    print(f"Output file: {output_filename}")
+    print(f"Output file: {output_file}")
     print("=" * 70)
     print("")
     
-    concatenate_audio(source_folder, output_filename)
+    concatenate_audio(source_folder, output_file)
